@@ -74,6 +74,7 @@
     "remember_password_label": "비밀번호 저장",
     "management_key_label": "관리 키:",
     "management_key_placeholder": "관리 키를 입력하세요",
+    "guest_key_hint": "게스트 키(cpg_...)도 사용할 수 있으며, 허용된 페이지만 열립니다.",
     "submit_button": "로그인",
     "submitting": "연결 중...",
     "error_backend_detail": "백엔드 응답",
@@ -107,7 +108,8 @@
     "plugin_store": "플러그인 스토어",
     "config_management": "설정 패널",
     "logs": "로그 뷰어",
-    "system_info": "관리 센터 정보"
+    "system_info": "관리 센터 정보",
+    "guests": "게스트 접근"
   },
   "nav_groups": {
     "operate": "운영",
@@ -127,7 +129,8 @@
     "plugin_store": "플러그인 탐색 및 설치",
     "logs": "요청 추적",
     "config_management": "게이트웨이 설정",
-    "system_info": "런타임 및 진단"
+    "system_info": "런타임 및 진단",
+    "guests": "게스트 키 및 권한"
   },
   "dashboard": {
     "hero_verdict_good": "모든 시스템 정상",
@@ -2310,5 +2313,45 @@
     "error": "바인딩에 실패했습니다. 다시 시작하세요.",
     "unsupported": "이 서버는 SIWC 바인딩을 지원하지 않습니다.",
     "expired": "바인딩 세션이 만료되었습니다. 다시 시작하세요."
+  },
+  "guests": {
+    "title": "게스트 접근",
+    "description": "관리 키 없이 패널을 사용하거나 플러그인을 개발할 수 있도록 게스트 키를 만드세요. 키마다 API 라우트별로 보기 또는 편집 권한을 줍니다.",
+    "route": "API 라우트",
+    "edit_on_get": "GET도 편집 권한 필요",
+    "plugin_routes": "플러그인이 등록한 라우트",
+    "view": "보기",
+    "edit": "편집",
+    "view_aria": "{{route}} 보기 권한",
+    "edit_aria": "{{route}} 편집 권한",
+    "view_only_banner": "보기 전용: 이 게스트 키로는 이 페이지에서 아무것도 변경할 수 없습니다.",
+    "load_failed": "게스트 키를 불러오지 못했습니다",
+    "create_failed": "게스트 키를 만들지 못했습니다",
+    "save_failed": "권한을 저장하지 못했습니다",
+    "rotate_failed": "키를 교체하지 못했습니다",
+    "delete_failed": "게스트 키를 삭제하지 못했습니다",
+    "name_required": "게스트 이름을 입력하세요",
+    "name_label": "이름",
+    "name_placeholder": "예: 플러그인 개발자",
+    "new_title": "새 게스트 키",
+    "create": "게스트 키 만들기",
+    "save": "권한 저장",
+    "saved": "권한이 저장되었습니다",
+    "rotate": "새 키",
+    "rotate_title": "키 교체",
+    "rotate_message": "{{name}}의 현재 키는 즉시 작동을 멈춥니다. 계속할까요?",
+    "delete": "삭제",
+    "delete_title": "게스트 키 삭제",
+    "delete_message": "{{name}}을(를) 삭제할까요? 해당 키는 즉시 작동을 멈춥니다.",
+    "copy_key": "키 복사",
+    "key_copied": "키를 복사했습니다",
+    "key_copy_failed": "키를 복사하지 못했습니다",
+    "dismiss": "닫기",
+    "key_issued": "{{name}}의 키",
+    "key_once": "지금 복사하세요. 다시 표시되지 않습니다.",
+    "sensitive_note": "config를 허용하면 공급자 키가, credentials-download는 자격 증명 파일이 노출되고, api-call은 저장된 자격 증명으로 요청을 보냅니다. 페이지가 호출하는 라우트(예: config)도 함께 허용해야 합니다.",
+    "empty_title": "게스트 키가 없습니다",
+    "empty_description": "위에서 만들어 제한된 접근 권한을 공유하세요.",
+    "created": "{{date}} 생성"
   }
 }

@@ -2,6 +2,7 @@
  * 认证相关类型定义
  * 基于原项目 src/modules/login.js 和 src/core/connection.js
  */
+import type { SessionInfo } from './guest';
 
 // 登录凭据
 export interface LoginCredentials {
@@ -19,6 +20,7 @@ export interface AuthState {
   serverVersion: string | null;
   serverBuildDate: string | null;
   supportsPlugin: boolean;
+  session: SessionInfo;
 }
 
 // 连接状态

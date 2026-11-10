@@ -74,6 +74,7 @@
     "remember_password_label": "记住密码",
     "management_key_label": "管理密钥:",
     "management_key_placeholder": "请输入管理密钥",
+    "guest_key_hint": "这里也可以使用访客密钥（cpg_...），只能打开已授权的页面。",
     "submit_button": "登录",
     "submitting": "连接中...",
     "error_backend_detail": "后端返回",
@@ -107,7 +108,8 @@
     "plugin_store": "插件商店",
     "config_management": "配置面板",
     "logs": "日志查看",
-    "system_info": "中心信息"
+    "system_info": "中心信息",
+    "guests": "访客权限"
   },
   "nav_groups": {
     "operate": "运行",
@@ -127,7 +129,8 @@
     "plugin_store": "发现并安装插件",
     "logs": "请求追踪与排查",
     "config_management": "网关基础配置",
-    "system_info": "运行与诊断信息"
+    "system_info": "运行与诊断信息",
+    "guests": "访客密钥与权限"
   },
   "dashboard": {
     "hero_verdict_good": "运行平稳",
@@ -2309,5 +2312,45 @@
     "error": "绑定失败，请重新开始。",
     "unsupported": "当前后端不支持 SIWC 绑定。",
     "expired": "绑定会话已过期，请重新开始。"
+  },
+  "guests": {
+    "title": "访客权限",
+    "description": "创建访客密钥，让他人无需管理密钥即可使用面板或开发插件。每个密钥可按 API 路由设置查看或编辑权限。",
+    "route": "API 路由",
+    "edit_on_get": "GET 也需要编辑权限",
+    "plugin_routes": "插件注册的路由",
+    "view": "查看",
+    "edit": "编辑",
+    "view_aria": "{{route}} 的查看权限",
+    "edit_aria": "{{route}} 的编辑权限",
+    "view_only_banner": "只读：此访客密钥无法修改本页内容。",
+    "load_failed": "加载访客密钥失败",
+    "create_failed": "创建访客密钥失败",
+    "save_failed": "保存权限失败",
+    "rotate_failed": "更换密钥失败",
+    "delete_failed": "删除访客密钥失败",
+    "name_required": "请输入访客名称",
+    "name_label": "名称",
+    "name_placeholder": "例如：插件开发者",
+    "new_title": "新建访客密钥",
+    "create": "创建访客密钥",
+    "save": "保存权限",
+    "saved": "权限已保存",
+    "rotate": "更换密钥",
+    "rotate_title": "更换密钥",
+    "rotate_message": "{{name}} 当前的密钥将立即失效。是否继续？",
+    "delete": "删除",
+    "delete_title": "删除访客密钥",
+    "delete_message": "删除 {{name}}？其密钥将立即失效。",
+    "copy_key": "复制密钥",
+    "key_copied": "密钥已复制",
+    "key_copy_failed": "无法复制密钥",
+    "dismiss": "关闭",
+    "key_issued": "{{name}} 的密钥",
+    "key_once": "请立即复制，之后不会再次显示。",
+    "sensitive_note": "授予 config 会暴露提供商密钥，credentials-download 会暴露凭据文件，api-call 会使用已存储的凭据发送请求。页面依赖的路由（例如 config）也需要一并授予。",
+    "empty_title": "还没有访客密钥",
+    "empty_description": "在上方创建一个以共享有限权限。",
+    "created": "创建于 {{date}}"
   }
 }

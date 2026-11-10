@@ -281,6 +281,7 @@ export function LoginPage() {
                 autoFocus
                 label={t('login.management_key_label')}
                 placeholder={t('login.management_key_placeholder')}
+                hint={t('login.guest_key_hint')}
                 type={showKey ? 'text' : 'password'}
                 name="cpa-management-key"
                 autoComplete="current-password"

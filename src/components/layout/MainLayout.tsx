@@ -30,6 +30,7 @@ import {
   IconSidebarStore,
   IconSidebarSystem,
   IconChevronDown,
+  IconShield,
 } from '@/components/ui/icons';
 import { INLINE_LOGO_JPEG } from '@/assets/logoInline';
 import {
@@ -50,6 +51,8 @@ import { APIKEY_FUN_DISPLAY_NAME, hasApiKeyFunConfig } from '@/features/provider
 import { triggerHeaderRefresh } from '@/hooks/useHeaderRefresh';
 import { LANGUAGE_LABEL_KEYS, LANGUAGE_ORDER } from '@/utils/constants';
 import { isSupportedLanguage } from '@/utils/language';
+import { canViewPath } from '@/utils/permissions';
+import { GuestBanner } from './GuestBanner';
 import { getSidebarShortcutLabel, isSidebarToggleShortcut } from '@/utils/sidebarShortcut';
 import type { Theme } from '@/types';
 
@@ -65,6 +68,7 @@ const sidebarIcons: Record<string, ReactNode> = {
   config: <IconSidebarConfig size={18} />,
   logs: <IconSidebarLogs size={18} />,
   system: <IconSidebarSystem size={18} />,
+  guests: <IconShield size={18} />,
 };
 
 interface SidebarNavLinkItem {
@@ -315,6 +319,9 @@ export function MainLayout() {
   const connectionStatus = useAuthStore((state) => state.connectionStatus);
   const apiBase = useAuthStore((state) => state.apiBase);
   const supportsPlugin = useAuthStore((state) => state.supportsPlugin);
+  const session = useAuthStore((state) => state.session);
+  const canSeePlugins = canViewPath(session, '/plugins');
+  const canSeeAuthFiles = canViewPath(session, '/auth-files');
 
   const fetchConfig = useConfigStore((state) => state.fetchConfig);
   const clearCache = useConfigStore((state) => state.clearCache);
@@ -485,7 +492,7 @@ export function MainLayout() {
   }, [fetchConfig]);
 
   const loadPluginResources = useCallback(async () => {
-    if (connectionStatus !== 'connected' || !supportsPlugin) {
+    if (connectionStatus !== 'connected' || !supportsPlugin || !canSeePlugins) {
       setPluginResources([]);
       return;
     }
@@ -496,11 +503,11 @@ export function MainLayout() {
     } catch {
       setPluginResources([]);
     }
-  }, [connectionStatus, supportsPlugin]);
+  }, [connectionStatus, supportsPlugin, canSeePlugins]);
 
   const loadAuthFilesCount = useCallback(async () => {
     const requestID = ++authFilesCountRequestRef.current;
-    if (connectionStatus !== 'connected') {
+    if (connectionStatus !== 'connected' || !canSeeAuthFiles) {
       setAuthFilesCount(null);
       return;
     }
@@ -513,7 +520,7 @@ export function MainLayout() {
       if (requestID !== authFilesCountRequestRef.current) return;
       setAuthFilesCount(null);
     }
-  }, [connectionStatus]);
+  }, [connectionStatus, canSeeAuthFiles]);
 
   useEffect(() => {
     const timer = window.setTimeout(() => {
@@ -592,7 +599,7 @@ export function MainLayout() {
     icon: sidebarIcons.quickStart,
   };
 
-  const navGroups: SidebarNavGroup[] = [
+  const allNavGroups: SidebarNavGroup[] = [
     {
       id: 'operate',
       labelKey: 'nav_groups.operate',
@@ -681,6 +688,12 @@ export function MainLayout() {
             ]
           : []),
         {
+          path: '/guests',
+          labelKey: 'nav.guests',
+          metaKey: 'nav_meta.guests',
+          icon: sidebarIcons.guests,
+        },
+        {
           path: '/system',
           labelKey: 'nav.system_info',
           metaKey: 'nav_meta.system_info',
@@ -698,6 +711,23 @@ export function MainLayout() {
         ]
       : []),
   ];
+  const navGroups = allNavGroups
+    .map((group) => ({
+      ...group,
+      items: group.items
+        .map((item) =>
+          item.kind === 'drawer'
+            ? {
+                ...item,
+                children: item.children.filter((child) => canViewPath(session, child.path)),
+              }
+            : item
+        )
+        .filter((item) =>
+          item.kind === 'drawer' ? item.children.length > 0 : canViewPath(session, item.path)
+        ),
+    }))
+    .filter((group) => group.items.length > 0);
   const navItems = navGroups.flatMap((group) => flattenNavItems(group.items));
   const navOrder = navItems.map((item) => item.path);
   const getRouteOrder = (pathname: string) => {
@@ -1202,6 +1232,7 @@ export function MainLayout() {
               isPluginResourcePage ? ' main-content-plugin-resource' : ''
             }`}
           >
+            <GuestBanner />
             <PageTransition
               render={(location) => <MainRoutes location={location} />}
               getRouteOrder={getRouteOrder}

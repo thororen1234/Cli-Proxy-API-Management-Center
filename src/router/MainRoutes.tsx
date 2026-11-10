@@ -12,7 +12,10 @@ import { PluginStorePage } from '@/features/plugins/PluginStorePage';
 import { ConfigPage } from '@/features/config/ConfigPage';
 import { LogsPage } from '@/features/logs/LogsPage';
 import { SystemPage } from '@/pages/SystemPage';
+import { GuestsPage } from '@/features/guests/GuestsPage';
 import { useAuthStore } from '@/stores';
+import { canViewPath, firstAccessiblePath } from '@/utils/permissions';
+import type { SessionInfo } from '@/types';
 
 const createMainRoutes = (supportsPlugin: boolean) => [
   { path: '/', element: <DashboardPage /> },
@@ -42,11 +45,23 @@ const createMainRoutes = (supportsPlugin: boolean) => [
       ]),
   { path: '/config', element: <ConfigPage /> },
   { path: '/logs', element: <LogsPage /> },
+  { path: '/guests', element: <GuestsPage /> },
   { path: '/system', element: <SystemPage /> },
   { path: '*', element: <Navigate to="/" replace /> },
 ];
 
+// Pages the session cannot open redirect to the first one it can.
+const guardRoutes = (routes: ReturnType<typeof createMainRoutes>, session: SessionInfo) => {
+  const fallback = firstAccessiblePath(session);
+  return routes.map((route) =>
+    canViewPath(session, route.path)
+      ? route
+      : { ...route, element: <Navigate to={fallback} replace /> }
+  );
+};
+
 export function MainRoutes({ location }: { location?: Location }) {
   const supportsPlugin = useAuthStore((state) => state.supportsPlugin);
-  return useRoutes(createMainRoutes(supportsPlugin), location);
+  const session = useAuthStore((state) => state.session);
+  return useRoutes(guardRoutes(createMainRoutes(supportsPlugin), session), location);
 }

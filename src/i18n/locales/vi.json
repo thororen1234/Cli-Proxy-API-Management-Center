@@ -74,6 +74,7 @@
     "remember_password_label": "Ghi nhớ mật khẩu",
     "management_key_label": "Key quản lý:",
     "management_key_placeholder": "Nhập key quản lý",
+    "guest_key_hint": "Khóa khách (cpg_...) cũng dùng được ở đây và chỉ mở các trang đã được cấp.",
     "submit_button": "Đăng nhập",
     "submitting": "Đang kết nối...",
     "error_backend_detail": "Phản hồi từ backend",
@@ -107,7 +108,8 @@
     "plugin_store": "Cửa hàng Plugin",
     "config_management": "Bảng cấu hình",
     "logs": "Trình xem Log",
-    "system_info": "Thông tin Trung tâm Quản lý"
+    "system_info": "Thông tin Trung tâm Quản lý",
+    "guests": "Quyền khách"
   },
   "nav_groups": {
     "operate": "Vận hành",
@@ -127,7 +129,8 @@
     "plugin_store": "Khám phá & cài đặt plugin",
     "logs": "Truy vết yêu cầu",
     "config_management": "Cấu hình gateway",
-    "system_info": "Runtime & chẩn đoán"
+    "system_info": "Runtime & chẩn đoán",
+    "guests": "Khóa khách & quyền"
   },
   "dashboard": {
     "hero_verdict_good": "Mọi hệ thống ổn định",
@@ -2316,5 +2319,45 @@
     "error": "Liên kết thất bại. Hãy bắt đầu lại.",
     "unsupported": "Máy chủ này không hỗ trợ liên kết SIWC.",
     "expired": "Phiên liên kết đã hết hạn. Hãy bắt đầu lại."
+  },
+  "guests": {
+    "title": "Quyền khách",
+    "description": "Tạo khóa khách để người khác dùng bảng điều khiển hoặc viết plugin mà không cần khóa quản lý. Mỗi khóa có quyền xem hoặc sửa theo từng route API.",
+    "route": "Route API",
+    "edit_on_get": "GET cũng cần quyền sửa",
+    "plugin_routes": "route do plugin đăng ký",
+    "view": "Xem",
+    "edit": "Sửa",
+    "view_aria": "Quyền xem {{route}}",
+    "edit_aria": "Quyền sửa {{route}}",
+    "view_only_banner": "Chỉ xem: khóa khách này không thể thay đổi gì trên trang này.",
+    "load_failed": "Không tải được khóa khách",
+    "create_failed": "Không tạo được khóa khách",
+    "save_failed": "Không lưu được quyền",
+    "rotate_failed": "Không đổi được khóa",
+    "delete_failed": "Không xóa được khóa khách",
+    "name_required": "Nhập tên khách",
+    "name_label": "Tên",
+    "name_placeholder": "ví dụ: người phát triển plugin",
+    "new_title": "Khóa khách mới",
+    "create": "Tạo khóa khách",
+    "save": "Lưu quyền",
+    "saved": "Đã lưu quyền",
+    "rotate": "Khóa mới",
+    "rotate_title": "Đổi khóa",
+    "rotate_message": "Khóa hiện tại của {{name}} sẽ ngừng hoạt động ngay. Tiếp tục?",
+    "delete": "Xóa",
+    "delete_title": "Xóa khóa khách",
+    "delete_message": "Xóa {{name}}? Khóa của họ sẽ ngừng hoạt động ngay.",
+    "copy_key": "Sao chép khóa",
+    "key_copied": "Đã sao chép khóa",
+    "key_copy_failed": "Không sao chép được khóa",
+    "dismiss": "Đóng",
+    "key_issued": "Khóa của {{name}}",
+    "key_once": "Hãy sao chép ngay. Khóa sẽ không hiển thị lại.",
+    "sensitive_note": "Cấp config sẽ lộ khóa nhà cung cấp, credentials-download lộ tệp thông tin xác thực, api-call gửi yêu cầu bằng thông tin xác thực đã lưu. Các route mà một trang gọi (ví dụ config) cũng cần được cấp.",
+    "empty_title": "Chưa có khóa khách",
+    "empty_description": "Tạo một khóa ở trên để chia sẻ quyền giới hạn.",
+    "created": "Tạo ngày {{date}}"
   }
 }

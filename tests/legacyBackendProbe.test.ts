@@ -1,9 +1,20 @@
-import { afterAll, afterEach, beforeAll, describe, expect, spyOn, test } from 'bun:test';
+import {
+  afterAll,
+  afterEach,
+  beforeAll,
+  beforeEach,
+  describe,
+  expect,
+  spyOn,
+  test,
+} from 'bun:test';
 import axios from 'axios';
 import { apiClient } from '@/services/api/client';
+import { guestsApi } from '@/services/api/guests';
 import { LegacyBackendError } from '@/services/api/legacyBackendProbe';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useConfigStore } from '@/stores/useConfigStore';
+import { normalizePermissions } from '@/utils/permissions';
 
 const spies: Array<{ mockRestore(): void }> = [];
 const originalFetchConfig = useConfigStore.getState().fetchConfig;
@@ -29,6 +40,14 @@ afterAll(() => {
   else Reflect.deleteProperty(globalThis, 'localStorage');
   if (originalWindow) Object.defineProperty(globalThis, 'window', originalWindow);
   else Reflect.deleteProperty(globalThis, 'window');
+});
+// Backends without guest keys have no /session route.
+beforeEach(() => {
+  spies.push(
+    spyOn(guestsApi, 'session').mockRejectedValue(
+      Object.assign(new Error('not found'), { status: 404 })
+    )
+  );
 });
 afterEach(() => {
   spies.splice(0).forEach((spy) => spy.mockRestore());
@@ -90,5 +109,63 @@ describe('legacy backend login diagnostic', () => {
     });
     spies.push(probe);
     await expect(useAuthStore.getState().login(credentials)).rejects.toBe(error);
+  });
+});
+
+describe('guest login', () => {
+  const guestCredentials = { ...credentials, managementKey: 'cpg_fixture-only' };
+
+  test('a guest without config access signs in without fetching the config', async () => {
+    spies.push(
+      spyOn(guestsApi, 'session').mockResolvedValue({
+        role: 'guest',
+        name: 'dev',
+        permissions: normalizePermissions({ logs: 'view' }),
+      })
+    );
+    const fetchConfig = spyOn(useConfigStore.getState(), 'fetchConfig').mockResolvedValue({});
+    spies.push(fetchConfig);
+
+    await useAuthStore.getState().login(guestCredentials);
+
+    expect(fetchConfig).not.toHaveBeenCalled();
+    expect(useAuthStore.getState().isAuthenticated).toBe(true);
+    expect(useAuthStore.getState().session.role).toBe('guest');
+    expect(useAuthStore.getState().session.permissions.logs).toBe('view');
+    expect(useAuthStore.getState().session.permissions.config ?? 'none').toBe('none');
+  });
+
+  test('a guest with config view loads the config', async () => {
+    spies.push(
+      spyOn(guestsApi, 'session').mockResolvedValue({
+        role: 'guest',
+        name: 'dev',
+        permissions: normalizePermissions({ config: 'view' }),
+      })
+    );
+    const fetchConfig = spyOn(useConfigStore.getState(), 'fetchConfig').mockResolvedValue({});
+    spies.push(fetchConfig);
+
+    await useAuthStore.getState().login(guestCredentials);
+
+    expect(fetchConfig).toHaveBeenCalledTimes(1);
+  });
+
+  test('a rejected guest key does not sign in', async () => {
+    const error = Object.assign(new Error('unauthorized'), { status: 401 });
+    spies.push(spyOn(guestsApi, 'session').mockRejectedValue(error));
+
+    await expect(useAuthStore.getState().login(guestCredentials)).rejects.toBe(error);
+    expect(useAuthStore.getState().isAuthenticated).toBe(false);
+  });
+
+  test('a backend without /session signs in as admin after the config check', async () => {
+    const fetchConfig = spyOn(useConfigStore.getState(), 'fetchConfig').mockResolvedValue({});
+    spies.push(fetchConfig);
+
+    await useAuthStore.getState().login(credentials);
+
+    expect(fetchConfig).toHaveBeenCalledTimes(1);
+    expect(useAuthStore.getState().session.role).toBe('admin');
   });
 });

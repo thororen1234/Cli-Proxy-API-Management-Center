@@ -9,11 +9,14 @@ import type { AuthState, LoginCredentials, ConnectionStatus } from '@/types';
 import { STORAGE_KEY_AUTH } from '@/utils/constants';
 import { obfuscatedStorage } from '@/services/storage/secureStorage';
 import { apiClient } from '@/services/api/client';
+import { guestsApi } from '@/services/api/guests';
 import { LegacyBackendError, probeLegacyBackend } from '@/services/api/legacyBackendProbe';
 import { useConfigStore } from './useConfigStore';
 import { useModelsStore } from './useModelsStore';
 import { useQuotaStore } from './useQuotaStore';
 import { detectApiBaseFromLocation, normalizeApiBase } from '@/utils/connection';
+import { ADMIN_SESSION, canReadConfig } from '@/utils/permissions';
+import type { SessionInfo } from '@/types';
 
 interface AuthStoreState extends AuthState {
   connectionStatus: ConnectionStatus;
@@ -29,6 +32,24 @@ interface AuthStoreState extends AuthState {
 
 let restoreSessionPromise: Promise<boolean> | null = null;
 
+// No access until the backend says otherwise.
+const NO_ACCESS_SESSION: SessionInfo = {
+  role: 'guest',
+  name: '',
+  permissions: {},
+};
+
+// Backends without guest keys have no /session route. Only the management key
+// works there, and the config fetch that follows still verifies it.
+const loadSession = async (): Promise<SessionInfo> => {
+  try {
+    return await guestsApi.session();
+  } catch (error) {
+    if ((error as { status?: number })?.status === 404) return ADMIN_SESSION;
+    throw error;
+  }
+};
+
 export const useAuthStore = create<AuthStoreState>()(
   persist(
     (set, get) => ({
@@ -40,6 +61,7 @@ export const useAuthStore = create<AuthStoreState>()(
       serverVersion: null,
       serverBuildDate: null,
       supportsPlugin: false,
+      session: NO_ACCESS_SESSION,
       connectionStatus: 'disconnected',
 
       // 恢复会话并自动登录
@@ -102,6 +124,7 @@ export const useAuthStore = create<AuthStoreState>()(
             serverVersion: null,
             serverBuildDate: null,
             supportsPlugin: false,
+            session: NO_ACCESS_SESSION,
           });
           useConfigStore.getState().clearCache();
           useModelsStore.getState().clearCache();
@@ -115,18 +138,21 @@ export const useAuthStore = create<AuthStoreState>()(
 
           // 测试连接 - 获取配置。只在 v8 路由不存在时诊断旧版后端。
           const revision = apiClient.getConnectionRevision();
-          try {
-            await useConfigStore.getState().fetchConfig(true);
-          } catch (error) {
-            if (
-              (error as { status?: number })?.status === 404 &&
-              revision === apiClient.getConnectionRevision() &&
-              (await probeLegacyBackend(apiBase, managementKey)) &&
-              revision === apiClient.getConnectionRevision()
-            ) {
-              throw new LegacyBackendError();
+          const session = await loadSession();
+          if (canReadConfig(session)) {
+            try {
+              await useConfigStore.getState().fetchConfig(true);
+            } catch (error) {
+              if (
+                (error as { status?: number })?.status === 404 &&
+                revision === apiClient.getConnectionRevision() &&
+                (await probeLegacyBackend(apiBase, managementKey)) &&
+                revision === apiClient.getConnectionRevision()
+              ) {
+                throw new LegacyBackendError();
+              }
+              throw error;
             }
-            throw error;
           }
 
           // 登录成功
@@ -135,6 +161,7 @@ export const useAuthStore = create<AuthStoreState>()(
             apiBase,
             managementKey,
             rememberPassword,
+            session,
             connectionStatus: 'connected',
           });
           if (rememberPassword) {
@@ -162,6 +189,7 @@ export const useAuthStore = create<AuthStoreState>()(
           serverVersion: null,
           serverBuildDate: null,
           supportsPlugin: false,
+          session: NO_ACCESS_SESSION,
           connectionStatus: 'disconnected',
         });
         localStorage.removeItem('isLoggedIn');
@@ -181,10 +209,14 @@ export const useAuthStore = create<AuthStoreState>()(
           set({ supportsPlugin: false });
 
           // 验证连接
-          await useConfigStore.getState().fetchConfig();
+          const session = await loadSession();
+          if (canReadConfig(session)) {
+            await useConfigStore.getState().fetchConfig();
+          }
 
           set({
             isAuthenticated: true,
+            session,
             connectionStatus: 'connected',
           });
 

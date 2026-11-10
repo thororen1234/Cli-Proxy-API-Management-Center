@@ -74,6 +74,7 @@
     "remember_password_label": "Remember password",
     "management_key_label": "Management Key:",
     "management_key_placeholder": "Enter the management key",
+    "guest_key_hint": "A guest key (cpg_...) works here too and opens only the pages it was granted.",
     "submit_button": "Login",
     "submitting": "Connecting...",
     "error_backend_detail": "Backend response",
@@ -107,7 +108,8 @@
     "plugin_store": "Plugin Store",
     "config_management": "Config Panel",
     "logs": "Logs Viewer",
-    "system_info": "Management Center Info"
+    "system_info": "Management Center Info",
+    "guests": "Guest Access"
   },
   "nav_groups": {
     "operate": "Operate",
@@ -127,7 +129,8 @@
     "plugin_store": "Discover & install plugins",
     "logs": "Request tracing",
     "config_management": "Gateway configuration",
-    "system_info": "Runtime & diagnostics"
+    "system_info": "Runtime & diagnostics",
+    "guests": "Guest keys & permissions"
   },
   "dashboard": {
     "hero_verdict_good": "All systems steady",
@@ -2310,5 +2313,45 @@
     "error": "Binding failed. Please start over.",
     "unsupported": "This backend does not support SIWC binding.",
     "expired": "The binding session expired. Please start over."
+  },
+  "guests": {
+    "title": "Guest Access",
+    "description": "Create guest keys so people can use the panel or build plugins without the management key. Each key gets view or edit access per API route.",
+    "route": "API route",
+    "edit_on_get": "GET also needs edit",
+    "plugin_routes": "routes registered by plugins",
+    "view": "View",
+    "edit": "Edit",
+    "view_aria": "View access to {{route}}",
+    "edit_aria": "Edit access to {{route}}",
+    "view_only_banner": "View only: this guest key cannot change anything on this page.",
+    "load_failed": "Failed to load guest keys",
+    "create_failed": "Failed to create guest key",
+    "save_failed": "Failed to save permissions",
+    "rotate_failed": "Failed to replace the key",
+    "delete_failed": "Failed to delete guest key",
+    "name_required": "Enter a name for the guest",
+    "name_label": "Name",
+    "name_placeholder": "e.g. plugin developer",
+    "new_title": "New guest key",
+    "create": "Create guest key",
+    "save": "Save permissions",
+    "saved": "Permissions saved",
+    "rotate": "New key",
+    "rotate_title": "Replace key",
+    "rotate_message": "The current key for {{name}} stops working immediately. Continue?",
+    "delete": "Delete",
+    "delete_title": "Delete guest key",
+    "delete_message": "Delete {{name}}? Its key stops working immediately.",
+    "copy_key": "Copy key",
+    "key_copied": "Key copied",
+    "key_copy_failed": "Could not copy the key",
+    "dismiss": "Dismiss",
+    "key_issued": "Key for {{name}}",
+    "key_once": "Copy it now. It is not shown again.",
+    "sensitive_note": "Granting config exposes provider keys, credentials-download exposes credential files, and api-call sends requests with stored credentials. A plugin that needs a page also needs the routes that page calls, e.g. config.",
+    "empty_title": "No guest keys yet",
+    "empty_description": "Create one above to share limited access.",
+    "created": "Created {{date}}"
   }
 }
